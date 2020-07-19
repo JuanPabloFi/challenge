@@ -16,7 +16,7 @@ public class MutantService {
 	private MutantDao mDao;
 
 	private char[][] matriz;
-
+	
 	/**
 	 * Devuelve true o false dependiendo si el DNA representa un mutante o no.
 	 * 
@@ -24,14 +24,13 @@ public class MutantService {
 	 * @return
 	 */
 	public boolean isMutant(List<String> dna) {
-		if (dna.size() < 4) {
-			return false;
-		}
 		popularMatriz(dna);
 
 		if (calcularHorizontales(matriz) || calcularVerticales(matriz) || calcularDiagonales(matriz)) {
+			mDao.saveAdn(dna, true);
 			return true;
 		} else {
+			mDao.saveAdn(dna, false);
 			return false;
 		}
 	}
@@ -104,8 +103,8 @@ public class MutantService {
 	 */
 	public JSONObject getStatistics() {
 		List<MutantData> lista = mDao.getStatistics();
-		int count_mutant_dna = 0;
-		int count_human_dna = 0;
+		float count_mutant_dna = 0;
+		float count_human_dna = 0;
 		float ratio = 0.0F;
 
 		for (MutantData mutantData : lista) {
@@ -129,7 +128,7 @@ public class MutantService {
 	 * @param ratio
 	 * @return
 	 */
-	private JSONObject buildJson(int count_mutant_dna, int count_human_dna, float ratio) {
+	private JSONObject buildJson(float count_mutant_dna, float count_human_dna, float ratio) {
 		JSONObject json = new JSONObject();
 		json.put("count_mutant_dna", count_mutant_dna);
 		json.put("count_human_dna", count_human_dna);
@@ -143,5 +142,17 @@ public class MutantService {
 
 	public void setmDao(MutantDao mDao) {
 		this.mDao = mDao;
+	}
+
+	public void validateRequest(List<String> dna) throws Exception {
+		if (dna.size() < 4) {
+			throw new Exception("La cadena de adn debe ser al menos de 4x4");
+		}
+		for (String string : dna) {
+			if (!string.matches("[ATCG]+")) {
+				throw new Exception("La cadena debe tener solo las letras A, T, C o G");
+			};
+		}
+		
 	}
 }

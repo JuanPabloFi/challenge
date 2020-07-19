@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import meli.Dao.MutantDao;
 import meli.Model.Dna;
 import meli.Service.MutantService;
 
@@ -18,24 +17,22 @@ public class MutantController {
 	@Autowired
 	private MutantService mService;
 
-	@Autowired
-	private MutantDao mDao;
-
 	/**
 	 * Servicio que recibe un Json con una cadena de ADN y devuelve status 200 si es
 	 * mutante o 403 si no lo es.
 	 * 
 	 * @param dna
 	 * @return
+	 * @throws Exception 
 	 */
 	@PostMapping(value = "/mutant")
-	public ResponseEntity<?> isMutant(@RequestBody Dna dna) {
+	public ResponseEntity<?> isMutant(@RequestBody Dna dna) throws Exception {
+		
+		mService.validateRequest(dna.getDna());
 
 		if (mService.isMutant(dna.getDna())) {
-			mDao.saveAdn(dna.getDna(), true);
 			return ResponseEntity.ok().build();
 		} else {
-			mDao.saveAdn(dna.getDna(), false);
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
 		}
 	}

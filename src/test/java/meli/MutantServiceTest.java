@@ -12,6 +12,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -28,6 +29,8 @@ public class MutantServiceTest {
 	@Autowired
 	MutantService mService;
 
+	@Mock
+	MutantDao mDao;
 	/**
 	 * Analiza 3 cadenas distintas de adn mutante y verifica que el analisis de
 	 * verdadero. dna1 tiene 4 caracteres iguales seguidos de forma horizontal dna2
@@ -58,7 +61,8 @@ public class MutantServiceTest {
 	public void isNotMutantTest() {
 		String[] dna = { "ATGCAA", "CAGTGC", "TTGTGT", "AGAAGG", "CCACTA", "TCACTG" };
 		List<String> dnaList = Arrays.asList(dna);
-
+		
+		Mockito.doNothing().when(mDao).saveAdn(Mockito.anyList(), Mockito.anyBoolean());
 		assertFalse(mService.isMutant(dnaList));
 
 	}
@@ -69,21 +73,35 @@ public class MutantServiceTest {
 	 * 
 	 * @throws JSONException
 	 */
-
 	@Test
 	public void testStats() throws JSONException {
-		MutantDao mDao = Mockito.mock(MutantDao.class);
 		
 		MutantData data = new MutantData();
+		MutantData data2 = new MutantData();
+		MutantData data3 = new MutantData();
 		data.setMutant(true);
+		data2.setMutant(false);
+		data3.setMutant(false);
 		List<MutantData> listData = new ArrayList<>();
 		listData.add(data);
+		listData.add(data2);
+		listData.add(data3);
 
 		Mockito.when(mDao.getStatistics()).thenReturn(listData);
 		mService.setmDao(mDao);
 		
 		JSONObject json = mService.getStatistics();
-		assertEquals(json.get("count_mutant_dna"), 1);
+		assertEquals(json.get("count_mutant_dna"), 1.0);
+	}
+	
+	@Test
+	public void validateRequestTest() throws Exception {
+		List<String> lista = new ArrayList<>();
+		lista.add("ATGCAA");
+		lista.add("CAGTGC");
+		lista.add("TTGTGT");
+		lista.add("AGAAGG");
+		mService.validateRequest(lista);
 	}
 
 }
