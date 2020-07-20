@@ -16,7 +16,7 @@ public class MutantService {
 	private MutantDao mDao;
 
 	private char[][] matriz;
-	
+
 	/**
 	 * Devuelve true o false dependiendo si el DNA representa un mutante o no.
 	 * 
@@ -26,7 +26,7 @@ public class MutantService {
 	public boolean isMutant(List<String> dna) {
 		popularMatriz(dna);
 
-		if (calcularHorizontales(matriz) || calcularVerticales(matriz) || calcularDiagonales(matriz)) {
+		if (verificarSiEsMutante(matriz)) {
 			mDao.saveAdn(dna, true);
 			return true;
 		} else {
@@ -39,43 +39,24 @@ public class MutantService {
 	 * @param mat
 	 * @return
 	 */
-	private boolean calcularDiagonales(char[][] mat) {
-		for (int y = 0; y < mat.length - 3; y++) {
-			for (int x = 0; x < mat.length - 3; x++) {
-				if (mat[x][y] == mat[x + 1][y + 1] && mat[x][y] == mat[x + 2][y + 2] && mat[x][y] == mat[x + 3][y + 3])
+	private boolean verificarSiEsMutante(char[][] mat) {
+		for (int i = 0; i < mat.length; i++) {
+			for (int j = 0; j < mat.length; j++) {
+				//verticales
+				if ((j<mat.length-3 && mat[j][i] == mat[j + 1][i] && mat[j][i] == mat[j + 2][i] && mat[j][i] == mat[j + 3][i]) ||
+						//horizontales
+						(i< mat.length-3 && mat[j][i] == mat[j][i + 1] && mat[j][i] == mat[j][i + 2] && mat[j][i] == mat[j][i + 3]) ||
+						//oblicuas
+						(i< mat.length-3 && j<mat.length-3 && mat[j][i] == mat[j + 1][i + 1] && mat[j][i] == mat[j + 2][i + 2]
+								&& mat[j][i] == mat[j + 3][i + 3])) {
 					return true;
+				}
+
 			}
 		}
 		return false;
 	}
 
-	/**
-	 * @param mat
-	 * @return
-	 */
-	private boolean calcularVerticales(char[][] mat) {
-		for (int x = 0; x < mat.length; x++) {
-			for (int y = 0; y < mat.length - 3; y++) {
-				if (mat[x][y] == mat[x][y + 1] && mat[x][y] == mat[x][y + 2] && mat[x][y] == mat[x][y + 3])
-					return true;
-			}
-		}
-		return false;
-	}
-
-	/**
-	 * @param mat
-	 * @return
-	 */
-	private boolean calcularHorizontales(char[][] mat) {
-		for (int y = 0; y < mat.length; y++) {
-			for (int x = 0; x < mat.length - 3; x++) {
-				if (mat[x][y] == mat[x + 1][y] && mat[x][y] == mat[x + 2][y] && mat[x][y] == mat[x + 3][y])
-					return true;
-			}
-		}
-		return false;
-	}
 
 	/**
 	 * Llena una matriz a partir de una lista de String.
@@ -151,8 +132,9 @@ public class MutantService {
 		for (String string : dna) {
 			if (!string.matches("[ATCG]+")) {
 				throw new Exception("La cadena debe tener solo las letras A, T, C o G");
-			};
+			}
+			;
 		}
-		
+
 	}
 }

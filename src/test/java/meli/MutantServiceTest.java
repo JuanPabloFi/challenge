@@ -39,7 +39,7 @@ public class MutantServiceTest {
 	 */
 	@Test
 	public void isMutantTest() {
-
+		mService.setmDao(mDao);
 		String[] dna1 = { "ATGCAA", "CAGTGC", "TTGTGT", "AGAAGG", "CCACTA", "TCAAAA" };
 		String[] dna2 = { "ATGCAA", "CAGTGC", "TTGTGT", "AGAAGT", "CCACTT", "TCACTT" };
 		String[] dna3 = { "ATGCAA", "CAGTGC", "TTATGT", "AGAAGG", "CCACAA", "TCCCTA" };
@@ -59,6 +59,7 @@ public class MutantServiceTest {
 	 */
 	@Test
 	public void isNotMutantTest() {
+		mService.setmDao(mDao);
 		String[] dna = { "ATGCAA", "CAGTGC", "TTGTGT", "AGAAGG", "CCACTA", "TCACTG" };
 		List<String> dnaList = Arrays.asList(dna);
 		
